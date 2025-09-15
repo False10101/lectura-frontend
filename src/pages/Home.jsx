@@ -8,57 +8,60 @@ const Home = () => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [convertedKey, setConvertedKey] = useState("");
-
+  const [fileName, setFileName] = useState("");
 
   const remove = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/note/deleteTemp/${convertedKey}`,
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/note/deleteTemp/${convertedKey}`,
         {
-          method: 'DELETE',
-          credentials: 'include',
-        })
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) {
         alert("There was a problem while converting, please try again.");
       }
 
       setConvertedKey("");
-
+      setFileName("");
     } catch (error) {
-      console.log(error)
+      console.log(error);
       alert("There was a problem while converting, please try again.");
     }
-  }
+  };
 
   useEffect(() => {
     if (uploadedFile) {
-
       const formData = new FormData();
-      formData.append("file", uploadedFile)
+      formData.append("file", uploadedFile);
       setLoading(true);
 
       try {
         const convert = async () => {
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/note/convert`,
+          const res = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/note/convert`,
             {
               method: "POST",
-              credentials: 'include',
+              credentials: "include",
               body: formData,
-            })
+            }
+          );
           const data = await res.json();
-          setConvertedKey(data.key)
-        }
+          setConvertedKey(data.key);
+          setFileName(uploadedFile.name);
+        };
 
         convert();
-
       } catch (error) {
-        console.log(error)
+        console.log(error);
         setLoading(false);
       } finally {
         setLoading(false);
       }
     }
-  }, [uploadedFile])
+  }, [uploadedFile]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -115,6 +118,31 @@ const Home = () => {
     setUploadedFile(file);
   };
 
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/note/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Add this line
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            fileName: fileName,
+            convertedKey: convertedKey,
+          }),
+        }
+      );
+      const data = await res.json();
+      console.log(data.noteId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex w-full h-screen">
       <SideBar />
@@ -126,10 +154,11 @@ const Home = () => {
             <div
               className={`flex w-[80%] h-[30%] border-dashed items-center rounded-lg my-6 2xl:my-8 py-1 2xl:py-2 mx-auto flex-col
              transition-all duration-300 hover:border-solid border-[1px] hover:border-[#00BFFF] hover:bg-[rgba(0,191,255,0.1)]
-              ${isDragging
+              ${
+                isDragging
                   ? "bg-[#00bfff]/10 border-solid border-[#00bfff] scale-105"
                   : "bg-transparent border-dashed"
-                }`}
+              }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -166,19 +195,32 @@ const Home = () => {
                     {uploadedFile.size < 1024 * 1024
                       ? Math.round(uploadedFile.size / 1024) + "KB"
                       : Math.round(uploadedFile.size / (1024 * 1024)) +
-                      "MB"}{" "}
+                        "MB"}{" "}
                     • TXT
                   </p>
                   <div className="flex space-x-3">
                     <button
                       onClick={handleRemoveFile}
-                      className={`text-xs bg-red-600 hover:bg-red-700 py-1 px-3 rounded transition-colors ${loading ? "hidden" : ""}`}
+                      className={`text-xs bg-red-600 hover:bg-red-700 py-1 px-3 rounded transition-colors ${
+                        loading ? "hidden" : ""
+                      }`}
                     >
                       Remove
                     </button>
                   </div>
                 </div>
               )}
+            </div>
+            <button
+              className="border-2 border-dashed bg-amber-600"
+              onClick={handleGenerate}
+            >
+              generate
+            </button>
+
+            <div>
+              <h1>{convertedKey || "no key"}</h1>
+              <h1>{fileName || "no file"}</h1>
             </div>
           </div>
           <div className="flex h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl"></div>
