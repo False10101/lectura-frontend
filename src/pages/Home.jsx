@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CloudArrowUpIcon, DocumentTextIcon } from "@heroicons/react/24/solid";
+import { CloudArrowUpIcon, DocumentTextIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import SideBar from "../components/SideBar";
 
 const Home = () => {
@@ -9,6 +9,7 @@ const Home = () => {
   const fileInputRef = useRef(null);
   const [convertedKey, setConvertedKey] = useState("");
   const [fileName, setFileName] = useState("");
+  const [username, setUsername] = useState("Charles");
 
   const remove = async () => {
     try {
@@ -146,17 +147,20 @@ const Home = () => {
   return (
     <div className="flex w-full h-screen">
       <SideBar />
-      <div className="w-[80vw] h-full flex-col">
-        <div className="Title-group h-[15%] border-rose-950 border-[1px]"></div>
-        <div className="Main-content flex h-[85%] border-rose-950 border-[1px] items-center justify-evenly">
-          <div className="flex-col h-[92%] w-[22.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
-            <h1 className="px-4 py-2">Upload your lecture</h1>
+      <div className="w-[84vw] h-full flex-col">
+        <div className="Title-group h-[10%] flex flex-col justify-end px-9">
+            <h1 className="text-3xl font-bold text-[#4C1D95] mb-1">Welcome Back, {username}</h1>
+            <p className="text-sm text-black/60 pt-1">Edit your transcript, regenerate and download your notes.</p>
+        </div>
+        <div className="Main-content flex h-[90%] items-center justify-evenly">
+          <div className="flex-col flex h-[92%] w-[22.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
+            <h1 className="px-4 py-2 font-semibold text-xl text-[#4C1D95]">Upload your lecture</h1>
             <div
-              className={`flex w-[80%] h-[30%] border-dashed items-center rounded-lg my-6 2xl:my-8 py-1 2xl:py-2 mx-auto flex-col
-             transition-all duration-300 hover:border-solid border-[1px] hover:border-[#00BFFF] hover:bg-[rgba(0,191,255,0.1)]
+              className={`flex w-[80%] h-[30%] border-dashed border-[#4C1D95]/40 items-center rounded-lg my-6 2xl:my-8 py-1 2xl:py-2 mx-auto flex-col
+             transition-all duration-300 hover:border-solid border-[1px] hover:bg-[#4C1D95]/10
               ${
                 isDragging
-                  ? "bg-[#00bfff]/10 border-solid border-[#00bfff] scale-105"
+                  ? "bg-[#4C1D95]/10 border-solid scale-105"
                   : "bg-transparent border-dashed"
               }`}
               onDragOver={handleDragOver}
@@ -176,7 +180,7 @@ const Home = () => {
                   onClick={() => fileInputRef.current.click()}
                 >
                   <CloudArrowUpIcon
-                    className={`text-[#00BFFF] w-12 h-12 2xl:w-15 2xl:h-15 transition-transform duration-300 group-hover:scale-110`}
+                    className={`text-[#4C1D95] w-12 h-12 2xl:w-15 2xl:h-15 transition-transform duration-300 group-hover:scale-110`}
                   />
                   <h1 className="text-sm text-center w-[80%] text-black mb-2">
                     Drag and drop or click to upload
@@ -187,7 +191,7 @@ const Home = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center w-full h-full p-4">
-                  <DocumentTextIcon className="w-10 h-10 2xl:w-12 2xl:h-12 text-[#00BFFF] mb-3" />
+                  <DocumentTextIcon className="w-10 h-10 2xl:w-12 2xl:h-12 text-[#4C1D95] mb-3" />
                   <h2 className="text-sm font-medium text-black pb-2 truncate w-full text-center">
                     {uploadedFile.name}
                   </h2>
@@ -211,19 +215,28 @@ const Home = () => {
                 </div>
               )}
             </div>
+
+              <label for="filename" className="w-[80%] flex justify-self-center mb-2 text-sm font-semibold mx-auto">Filename</label>
+            <input
+              id="filename"
+              className=" border-[1px] border-[#4C1D95]/40 w-[80%] flex mx-auto rounded-sm px-2 text-sm py-1 "
+              type="text"
+              placeholder="Lecture Video 1"
+              defaultValue={fileName}
+              onChange={(e)=> setFileName(e.target.value)}
+            />
             <button
-              className="border-2 border-dashed bg-amber-600"
+              className="rounded-sm bg-gradient-to-r from-[#4C1D95] via-[#312E81] to-[#1E1B4B] w-[80%] flex mx-auto mt-auto mb-8 py-1 text-white font-semibold"
               onClick={handleGenerate}
             >
-              generate
+              <SparklesIcon className="h-4 w-4 my-auto mr-1 ml-auto" />
+              <span className="mr-auto">Generate Notes</span>
             </button>
 
-            <div>
-              <h1>{convertedKey || "no key"}</h1>
-              <h1>{fileName || "no file"}</h1>
-            </div>
           </div>
-          <div className="flex h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl"></div>
+          <div className="flex h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
+              <h1 className="px-5 py-2 font-semibold text-xl text-[#4C1D95]">Generated Lecture Notes</h1>
+          </div>
         </div>
       </div>
     </div>
