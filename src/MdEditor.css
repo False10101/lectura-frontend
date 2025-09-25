@@ -1,0 +1,23 @@
+.editor-container .w-md-editor-bar {
+  background-color: #faf8fe !important;
+  border-bottom: 1px solid #6b728030 !important;
+}
+
+.editor-container .w-md-editor-toolbar {
+  background-color: #faf8fe !important;
+  color: black !important;
+}
+
+.editor-container .w-md-editor-toolbar .icon-md {
+  color: black !important;
+}
+
+.editor-container .w-md-editor-input {
+  background-color: transparent !important;
+}
+
+.editor-container .w-md-editor-input,
+.editor-container .w-md-editor-preview {
+  background-color: transparent !important;
+  color: black !important;
+}

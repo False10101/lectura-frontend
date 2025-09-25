@@ -148,13 +148,13 @@ const Home = () => {
     <div className="flex w-full h-screen">
       <SideBar />
       <div className="w-[84vw] h-full flex-col">
-        <div className="Title-group h-[10%] flex flex-col justify-end px-9">
+        <div className="Title-group h-[10%] flex flex-col justify-center px-9">
             <h1 className="text-3xl font-bold text-[#4C1D95] mb-1">Welcome Back, {username}</h1>
             <p className="text-sm text-black/60 pt-1">Edit your transcript, regenerate and download your notes.</p>
         </div>
-        <div className="Main-content flex h-[90%] items-center justify-evenly">
+        <div className="Main-content flex h-[90%] items-center justify-evenly border-l-[1px] border-t-[1px] border-[#6B7280]/30">
           <div className="flex-col flex h-[92%] w-[22.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
-            <h1 className="px-4 py-2 font-semibold text-xl text-[#4C1D95]">Upload your lecture</h1>
+            <h1 className="px-4 py-2 font-semibold text-2xl text-[#4C1D95]">Upload your lecture</h1>
             <div
               className={`flex w-[80%] h-[30%] border-dashed border-[#4C1D95]/40 items-center rounded-lg my-6 2xl:my-8 py-1 2xl:py-2 mx-auto flex-col
              transition-all duration-300 hover:border-solid border-[1px] hover:bg-[#4C1D95]/10
@@ -234,8 +234,14 @@ const Home = () => {
             </button>
 
           </div>
-          <div className="flex h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
-              <h1 className="px-5 py-2 font-semibold text-xl text-[#4C1D95]">Generated Lecture Notes</h1>
+          <div className="flex flex-col h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl bg-[#faf8fe]">
+              <h1 className="px-5 py-2 font-semibold text-2xl text-[#4C1D95]">Generated Lecture Notes</h1>
+
+              <span className="w-full flex flex-col h-max my-auto space-y-6">
+                <DocumentTextIcon className="w-25 h-25 mx-auto bg-[#4C1D95]/10 py-5 rounded-xl text-[#4C1D95]"/>
+                <span className="mx-auto text-2xl font-bold">No Notes Generated Yet!</span>
+                <span className="mx-auto">Upload a transcript or recording to begin generating your personalized notes.</span>
+              </span>
           </div>
         </div>
       </div>
