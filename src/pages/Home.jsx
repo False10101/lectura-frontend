@@ -1,15 +1,41 @@
 import React, { useState, useRef, useEffect } from "react";
-import { CloudArrowUpIcon, DocumentTextIcon, SparklesIcon } from "@heroicons/react/24/solid";
+import {
+  CloudArrowUpIcon,
+  DocumentTextIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/solid";
 import SideBar from "../components/SideBar";
+import { useNavigate } from "react-router-dom";
+const LoadingModal = ({ loading, loadingMessage }) => {
+  if (!loading) {
+    return null;
+  }
+
+  return (
+    <div className="fixed flex inset-0 bg-black/60 backdrop-blur-sm justify-center items-center z-50">
+      <div className="bg-white border border-[#4C1D95] rounded-xl p-8 w-[25%] h-[30%] m-auto self-center flex justify-center flex-col shadow-2xl text-center">
+        <div className="w-16 h-16 mx-auto mb-6 border-4 border-t-4 border-[#4C1D95] border-t-transparent rounded-full animate-spin" />
+        <h3 className="text-xl font-semibold mb-2">
+          {loadingMessage.charAt(0).toUpperCase() + loadingMessage.slice(1)}...
+        </h3>
+      </div>
+    </div>
+  );
+};
 
 const Home = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
+
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [convertedKey, setConvertedKey] = useState("");
   const [fileName, setFileName] = useState("");
   const [username, setUsername] = useState("Charles");
+
+  const navigate = useNavigate();
+  const [pollingNoteId, setPollingNoteId] = useState(null);
 
   const remove = async () => {
     try {
@@ -38,28 +64,33 @@ const Home = () => {
       const formData = new FormData();
       formData.append("file", uploadedFile);
       setLoading(true);
+      setLoadingMessage("uploading");
 
       try {
         const convert = async () => {
-          const res = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/note/convert`,
-            {
-              method: "POST",
-              credentials: "include",
-              body: formData,
-            }
-          );
-          const data = await res.json();
-          setConvertedKey(data.key);
-          setFileName(uploadedFile.name);
+          try {
+            const res = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/note/convert`,
+              {
+                method: "POST",
+                credentials: "include",
+                body: formData,
+              }
+            );
+            const data = await res.json();
+            setConvertedKey(data.key);
+            setFileName(uploadedFile.name);
+          } catch (err) {
+            console.log(err);
+          } finally {
+            setLoading(false); // Only here
+            setLoadingMessage("");
+          }
         };
 
         convert();
       } catch (error) {
         console.log(error);
-        setLoading(false);
-      } finally {
-        setLoading(false);
       }
     }
   }, [uploadedFile]);
@@ -121,6 +152,8 @@ const Home = () => {
 
   const handleGenerate = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setLoadingMessage("Generating notes...");
 
     try {
       const res = await fetch(
@@ -139,22 +172,75 @@ const Home = () => {
       );
       const data = await res.json();
       console.log(data.noteId);
+      setPollingNoteId(data.noteId);
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      setLoadingMessage("");
     }
   };
 
+  useEffect(() => {
+    if (!pollingNoteId) return;
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/note/status/${pollingNoteId}`,
+          { credentials: "include" }
+        );
+        if (!response.ok) throw new Error("Could not get job status.");
+        const data = await response.json();
+        setLoadingMessage(
+          data.status.charAt(0).toUpperCase() + data.status.slice(1)
+        );
+        if (data.status === "completed") {
+          clearInterval(intervalId);
+          setLoading(false);
+          setLoadingMessage("");
+          navigate(`/note/${pollingNoteId}`, { replace: true });
+        } else if (data.status === "failed") {
+          clearInterval(intervalId);
+          setLoading(false);
+          setLoadingMessage("");
+          alert(
+            "Generation Failed",
+            data.errorMessage || "An unknown error occurred."
+          );
+          setPollingNoteId(null);
+        }
+      } catch (error) {
+        console.error(error);
+        clearInterval(intervalId);
+        setLoading(false);
+        setLoadingMessage("");
+        alert(
+          "Status Check Error",
+          "An error occurred while checking the note status."
+        );
+        setPollingNoteId(null);
+      }
+    }, 5000);
+    return () => clearInterval(intervalId);
+  }, [pollingNoteId]);
+
   return (
     <div className="flex w-full h-screen">
+      <LoadingModal loading={loading} loadingMessage={loadingMessage} />
       <SideBar />
       <div className="w-[84vw] h-full flex-col">
         <div className="Title-group h-[10%] flex flex-col justify-center px-9">
-            <h1 className="text-3xl font-bold text-[#4C1D95] mb-1">Welcome Back, {username}</h1>
-            <p className="text-sm text-black/60 pt-1">Edit your transcript, regenerate and download your notes.</p>
+          <h1 className="text-3xl font-bold text-[#4C1D95] mb-1">
+            Welcome Back, {username}
+          </h1>
+          <p className="text-sm text-black/60 pt-1">
+            Edit your transcript, regenerate and download your notes.
+          </p>
         </div>
         <div className="Main-content flex h-[90%] items-center justify-evenly border-l-[1px] border-t-[1px] border-[#6B7280]/30">
           <div className="flex-col flex h-[92%] w-[22.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl">
-            <h1 className="px-4 py-2 font-semibold text-2xl text-[#4C1D95]">Upload your lecture</h1>
+            <h1 className="px-4 py-2 font-semibold text-2xl text-[#4C1D95]">
+              Upload your lecture
+            </h1>
             <div
               className={`flex w-[80%] h-[30%] border-dashed border-[#4C1D95]/40 items-center rounded-lg my-6 2xl:my-8 py-1 2xl:py-2 mx-auto flex-col
              transition-all duration-300 hover:border-solid border-[1px] hover:bg-[#4C1D95]/10
@@ -216,14 +302,19 @@ const Home = () => {
               )}
             </div>
 
-              <label for="filename" className="w-[80%] flex justify-self-center mb-2 text-sm font-semibold mx-auto">Filename</label>
+            <label
+              for="filename"
+              className="w-[80%] flex justify-self-center mb-2 text-sm font-semibold mx-auto"
+            >
+              Filename
+            </label>
             <input
               id="filename"
               className=" border-[1px] border-[#4C1D95]/40 w-[80%] flex mx-auto rounded-sm px-2 text-sm py-1 "
               type="text"
               placeholder="Lecture Video 1"
               defaultValue={fileName}
-              onChange={(e)=> setFileName(e.target.value)}
+              onChange={(e) => setFileName(e.target.value)}
             />
             <button
               className="rounded-sm bg-gradient-to-r from-[#4C1D95] via-[#312E81] to-[#1E1B4B] w-[80%] flex mx-auto mt-auto mb-8 py-1 text-white font-semibold"
@@ -232,16 +323,22 @@ const Home = () => {
               <SparklesIcon className="h-4 w-4 my-auto mr-1 ml-auto" />
               <span className="mr-auto">Generate Notes</span>
             </button>
-
           </div>
           <div className="flex flex-col h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl bg-[#faf8fe]">
-              <h1 className="px-5 py-2 font-semibold text-2xl text-[#4C1D95]">Generated Lecture Notes</h1>
+            <h1 className="px-5 py-2 font-semibold text-2xl text-[#4C1D95]">
+              Generated Lecture Notes
+            </h1>
 
-              <span className="w-full flex flex-col h-max my-auto space-y-6">
-                <DocumentTextIcon className="w-25 h-25 mx-auto bg-[#4C1D95]/10 py-5 rounded-xl text-[#4C1D95]"/>
-                <span className="mx-auto text-2xl font-bold">No Notes Generated Yet!</span>
-                <span className="mx-auto">Upload a transcript or recording to begin generating your personalized notes.</span>
+            <span className="w-full flex flex-col h-max my-auto space-y-6">
+              <DocumentTextIcon className="w-25 h-25 mx-auto bg-[#4C1D95]/10 py-5 rounded-xl text-[#4C1D95]" />
+              <span className="mx-auto text-2xl font-bold">
+                No Notes Generated Yet!
               </span>
+              <span className="mx-auto">
+                Upload a transcript or recording to begin generating your
+                personalized notes.
+              </span>
+            </span>
           </div>
         </div>
       </div>

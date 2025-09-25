@@ -47,28 +47,28 @@ const Login = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-t from-[#05020A] to-[#100A14] text-white overflow-hidden">
-      <div className="hidden xl:flex w-1/2 p-12 items-center justify-center relative bg-[radial-gradient(ellipse_at_center,_#241A3A_0%,_#07020D_100%)]">
+    <div className="flex h-screen  text-black overflow-hidden">
+      <div className="hidden xl:flex w-1/2 h-[75vh] self-center p-12 items-center justify-center relative border-r-[1px]">
         <div className="relative z-10 text-center">
           <Box
             size={100}
             color="#B388FF"
-            className="mx-auto mb-6 drop-shadow-[0_0_10px_rgba(179,136,255,0.7)]"
+            className="mx-auto mb-6 drop-shadow-[0_0_15px_rgba(76,29,149,0.5)]"
           />
-          <h1 className="font-orbitron text-6xl font-bold text-[#C6A6FF] drop-shadow-[0_0_15px_rgba(198,166,255,0.7)]">
+          <h1 className="font-orbitron text-6xl font-bold text-[#4C1D95] drop-shadow-[0_0_15px_rgba(76,29,149,0.5)]">
             Lectura
           </h1>
-          <p className="mt-4 text-xl font-lexend text-white/80 max-w-sm mx-auto">
+          <p className="mt-4 text-xl font-lexend text-black max-w-sm mx-auto">
             Your personal dashboard for a more organized life.
           </p>
         </div>
       </div>
       <div className="w-full xl:w-1/2 flex items-center justify-center p-8 relative z-20">
-        <div className="w-full max-w-md p-8 bg-[radial-gradient(ellipse_at_center,_#241A3A_0%,_#07020D_100%)] rounded-xl shadow-lg border-[1px] border-[#B388FF]/50">
-          <h2 className="text-3xl font-orbitron font-bold text-center text-[#C6A6FF] mb-2">
+        <div className="w-full max-w-md p-8 rounded-xl shadow-lg border-[1px] border-[#B388FF]/50">
+          <h2 className="text-3xl font-orbitron font-bold text-center text-[#4C1D95] mb-2">
             Log In
           </h2>
-          <p className="text-center text-white/70 mb-8">
+          <p className="text-center mb-8">
             Welcome back! Please enter your details.
           </p>
           {error && (
@@ -79,7 +79,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
-                className="block text-sm font-medium text-white/90 mb-1"
+                className="block text-sm font-medium mb-1"
                 htmlFor="username"
               >
                 Username
@@ -90,12 +90,12 @@ const Login = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full p-3 rounded-lg bg-white/5 border border-[#B388FF]/50 focus:outline-none focus:ring-2 focus:ring-[#DA8FFF] transition-colors duration-200 text-white"
+                className="w-full p-3 rounded-lg border border-[#B388FF]/50 focus:outline-none focus:ring-2 focus:ring-[#DA8FFF] transition-colors duration-200"
               />
             </div>
             <div>
               <label
-                className="block text-sm font-medium text-white/90 mb-1"
+                className="block text-sm font-medium mb-1"
                 htmlFor="password"
               >
                 Password
@@ -106,22 +106,22 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-3 rounded-lg bg-white/5 border border-[#B388FF]/50 focus:outline-none focus:ring-2 focus:ring-[#DA8FFF] transition-colors duration-200 text-white"
+                className="w-full p-3 rounded-lg border border-[#B388FF]/50 focus:outline-none focus:ring-2 focus:ring-[#DA8FFF] transition-colors duration-200 "
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#B388FF] to-[#DA8FFF] text-white font-semibold shadow-lg hover:from-[#DA8FFF] hover:to-[#B388FF] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 rounded-lg text-white bg-gradient-to-r from-[#6A0DAD] to-[#C724B1] font-semibold shadow-lg hover:from-[#C724B1] hover:to-[#6A0DAD] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Logging In..." : "Log In"}
             </button>
           </form>
-          <div className="mt-6 text-center text-sm text-white/70">
+          <div className="mt-6 text-center text-sm">
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-[#DA8FFF] hover:underline font-medium"
+              className="text-[#4C1D95] hover:underline font-medium"
             >
               Sign up
             </Link>
