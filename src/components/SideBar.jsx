@@ -58,10 +58,10 @@ const SideBar = () => {
       <div className="w-full h-min flex py-4 flex-col flex-grow overflow-hidden pb-9">
         <div
           onClick={() => handleRedirect("/note")}
-          className={`w-[90%] flex h-max py-3 ${
-            pathname === "/note" || pathname === ""
+          className={`w-full flex h-max py-3 cursor-pointer  my-1 ${
+            pathname.includes("note")
               ? "bg-[#4C1D95] drop-shadow-lg text-white "
-              : ""
+              : "hover:bg-[#4C1D95]/10"
           } rounded-xl px-3 items-center`}
         >
           <HomeIcon className="w-4 h-4 " />
@@ -69,8 +69,8 @@ const SideBar = () => {
         </div>
         <div
           onClick={() => handleRedirect("/quiz")}
-          className={`w-[90%] flex h-max py-3 ${
-            pathname === "quiz" ? "bg-[#4C1D95] drop-shadow-lg text-white " : ""
+          className={`w-full flex h-max py-3 cursor-pointer  my-1 ${
+            pathname.includes("quiz") ? "bg-[#4C1D95] drop-shadow-lg text-white " : "hover:bg-[#4C1D95]/10"
           } rounded-xl px-3 items-center`}
         >
           <LightBulbIcon className="w-4 h-4 " />
@@ -80,15 +80,15 @@ const SideBar = () => {
         <div className="w-full mt-4 flex flex-col overflow-hidden">
           <h1 className="text-xl mb-4 ml-2 font-semibold">History</h1>
 
-          <div className="w-full flex flex-col overflow-auto">
+          <div className="w-full flex flex-col overflow-auto no-scrollbar">
             {historyList.map((history, index) => (
-              <div key={index} className="w-full h-min py-0.5 px-2 my-3 flex">
-                <Videotape size={20} className="w-[10%]" color="#4C1D95" />
+              <div key={index} className={`w-full h-min py-0.5 px-2 my-1 py-2 rounded-lg flex  cursor-pointer select-none scrollwheel ${
+                    history.id == noteId ? "bg-[#4C1D95] text-white" : "hover:bg-[#4C1D95]/10"
+                  }`}>
+                <Videotape size={20} className="w-[10%] mt-0.5"  />
                 <div
-                  onClick={() => handleRedirect(`note/${history.id}`)}
-                  className={`truncate w-[90%] ml-3 ${
-                    history.id == noteId ? "bg-black" : ""
-                  }`}
+                  onClick={() => handleRedirect(`/note/${history.id}`)}
+                  className={`truncate w-[90%] ml-3`}
                 >
                   {history.name}
                 </div>
