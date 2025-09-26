@@ -6,99 +6,107 @@ import {
 } from "@heroicons/react/24/solid";
 import SideBar from "../components/SideBar";
 import { useNavigate } from "react-router-dom";
-import { ArrowPathIcon, CheckCircleIcon, MusicalNoteIcon } from "@heroicons/react/24/solid";
-
-
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  MusicalNoteIcon,
+} from "@heroicons/react/24/solid";
 
 const steps = [
-    { key: "preparing", label: "Preparing File", icon: MusicalNoteIcon },   // pending
-    { key: "transcribing", label: "Transcribing Audio", icon: ArrowPathIcon },
-    { key: "converting", label: "Generating Notes", icon: DocumentTextIcon },
-    { key: "finalizing", label: "Finalizing Notes", icon: SparklesIcon },
-    { key: "completed", label: "Completed", icon: CheckCircleIcon },
+  { key: "preparing", label: "Preparing File", icon: MusicalNoteIcon }, // pending
+  { key: "transcribing", label: "Transcribing Audio", icon: ArrowPathIcon },
+  { key: "converting", label: "Generating Notes", icon: DocumentTextIcon },
+  { key: "finalizing", label: "Finalizing Notes", icon: SparklesIcon },
+  { key: "completed", label: "Completed", icon: CheckCircleIcon },
 ];
 
-
-
 const StepLoader = ({ currentStep, completedColor = "#4C1D95" }) => {
-    return (
-        <div className="flex justify-between items-center w-full">
-            {steps.map((step, idx) => {
-                const isActive = idx === currentStep;
-                const isDone = idx < currentStep;
-                const Icon = step.icon;
+  return (
+    <div className="flex justify-between items-center w-full">
+      {steps.map((step, idx) => {
+        const isActive = idx === currentStep;
+        const isDone = idx < currentStep;
+        const Icon = step.icon;
 
-                return (
-                    <div key={step.key} className="flex flex-col items-center flex-1 relative">
-                        {isDone ? (
-                            <CheckCircleIcon className={`w-10 h-10 text-[${completedColor}] animate-pulse`} />
-                        ) : (
-                            <Icon
-                                className={`w-10 h-10 ${isActive ? "text-[#4C1D95] animate-bounce" : "text-gray-400"}`}
-                            />
-                        )}
-                        <span
-                            className={`mt-2 text-sm font-medium text-center ${isActive
-                                ? "text-[#4C1D95]"
-                                : isDone
-                                    ? `text-[${completedColor}]`
-                                    : "text-gray-500"
-                                }`}
-                        >
-                            {step.label}
-                        </span>
+        return (
+          <div
+            key={step.key}
+            className="flex flex-col items-center flex-1 relative"
+          >
+            {isDone ? (
+              <CheckCircleIcon
+                className={`w-10 h-10 text-[${completedColor}] animate-pulse`}
+              />
+            ) : (
+              <Icon
+                className={`w-10 h-10 ${
+                  isActive ? "text-[#4C1D95] animate-bounce" : "text-gray-400"
+                }`}
+              />
+            )}
+            <span
+              className={`mt-2 text-sm font-medium text-center ${
+                isActive
+                  ? "text-[#4C1D95]"
+                  : isDone
+                  ? `text-[${completedColor}]`
+                  : "text-gray-500"
+              }`}
+            >
+              {step.label}
+            </span>
 
-                        {/* Connector line except for last step */}
-                        {idx < steps.length - 1 && (
-                            <div
-                                className={`absolute top-5 left-[calc(50%+20px)] w-full h-0.5 ${isDone ? `bg-[${completedColor}]` : "bg-gray-300"}`}
-                            ></div>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    );
+            {/* Connector line except for last step */}
+            {idx < steps.length - 1 && (
+              <div
+                className={`absolute top-5 left-[calc(50%+20px)] w-full h-0.5 ${
+                  isDone ? `bg-[${completedColor}]` : "bg-gray-300"
+                }`}
+              ></div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
-
 const GenerateLoadingModal = ({ loading, loadingMessage }) => {
-    if (!loading) return null;
+  if (!loading) return null;
 
-    // Map backend status to step index
-    const mapStatusToStep = (status) => {
-        if (!status) return 0;
-        switch (status.toLowerCase()) {
-            case "pending":
-                return 0; // Preparing File
-            case "transcribing":
-                return 1;
-            case "transcribed":
-                return 1; // optional, still second step active
-            case "converting":
-                return 2;
-            case "finalizing":
-                return 3;
-            case "completed":
-                return 4; // mark last step complete
-            case "failed":
-                return 0; // or highlight as failed
-            default:
-                return 0;
-        }
-    };
+  // Map backend status to step index
+  const mapStatusToStep = (status) => {
+    if (!status) return 0;
+    switch (status.toLowerCase()) {
+      case "pending":
+        return 0; // Preparing File
+      case "transcribing":
+        return 1;
+      case "transcribed":
+        return 1; // optional, still second step active
+      case "converting":
+        return 2;
+      case "finalizing":
+        return 3;
+      case "completed":
+        return 4; // mark last step complete
+      case "failed":
+        return 0; // or highlight as failed
+      default:
+        return 0;
+    }
+  };
 
-
-    return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
-            <div className="bg-white border border-[#4C1D95] rounded-xl p-8 w-[70%] shadow-2xl">
-                <h3 className="text-2xl font-semibold mb-8 text-center text-[#4C1D95]">
-                    Regenerating Notes
-                </h3>
-                <StepLoader currentStep={mapStatusToStep(loadingMessage)} />
-            </div>
-        </div>
-    );
+  return (
+    <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
+      <div className="bg-white border border-[#4C1D95] rounded-xl p-8 w-[70%] shadow-2xl">
+        <h3 className="text-2xl font-semibold mb-8 text-center text-[#4C1D95]">
+          Regenerating Notes
+        </h3>
+        <StepLoader currentStep={mapStatusToStep(loadingMessage)} />
+      </div>
+    </div>
+  );
 };
 
 const LoadingModal = ({ loading, loadingMessage }) => {
@@ -118,49 +126,48 @@ const LoadingModal = ({ loading, loadingMessage }) => {
   );
 };
 
-
 const UploadModal = ({ uploading, fileName }) => {
-    if (!uploading) return null;
+  if (!uploading) return null;
 
-    return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-            <div className="bg-white border border-[#4C1D95] rounded-xl p-6 w-[25%] h-[22%] flex flex-col items-center shadow-2xl">
-                <h3 className="text-lg font-semibold mb-4 text-[#4C1D95]">
-                    Uploading File...
-                </h3>
-                <div className="w-16 h-16 border-4 border-t-4 border-[#4C1D95] border-t-transparent rounded-full animate-spin" />
-            </div>
-        </div>
-    );
+  return (
+    <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+      <div className="bg-white border border-[#4C1D95] rounded-xl p-6 w-[25%] h-[22%] flex flex-col items-center shadow-2xl">
+        <h3 className="text-lg font-semibold mb-4 text-[#4C1D95]">
+          Uploading File...
+        </h3>
+        <div className="w-16 h-16 border-4 border-t-4 border-[#4C1D95] border-t-transparent rounded-full animate-spin" />
+      </div>
+    </div>
+  );
 };
 
 const FetchDetailsModal = ({ loading, message }) => {
-    if (!loading) return null;
+  if (!loading) return null;
 
-    return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
-            <div className="bg-white border border-[#4C1D95] rounded-xl p-6 w-[25%] h-[22%] flex flex-col justify-center items-center shadow-2xl">
-                <div className="w-16 h-16 border-4 border-t-4 border-[#4C1D95] border-t-transparent rounded-full animate-spin mb-4" />
-                <h3 className="text-center text-[#4C1D95] font-semibold">{message}</h3>
-            </div>
-        </div>
-    );
+  return (
+    <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
+      <div className="bg-white border border-[#4C1D95] rounded-xl p-6 w-[25%] h-[22%] flex flex-col justify-center items-center shadow-2xl">
+        <div className="w-16 h-16 border-4 border-t-4 border-[#4C1D95] border-t-transparent rounded-full animate-spin mb-4" />
+        <h3 className="text-center text-[#4C1D95] font-semibold">{message}</h3>
+      </div>
+    </div>
+  );
 };
-
 
 const Home = () => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
 
-      const [uploading, setUploading] = useState(false);
-      const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
   const [convertedKey, setConvertedKey] = useState("");
   const [fileName, setFileName] = useState("");
-  const [username, setUsername] = useState("Charles");
+  const [username, setUsername] = useState("");
+  const [vark, setVark] = useState("");
 
   const navigate = useNavigate();
   const [pollingNoteId, setPollingNoteId] = useState(null);
@@ -349,16 +356,34 @@ const Home = () => {
     return () => clearInterval(intervalId);
   }, [pollingNoteId]);
 
+  useEffect(() => {
+    const fetchUserDetail = async () => {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/info`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await res.json();
+      setUsername(data.name);
+      setVark(data.vark_type);
+    };
+    fetchUserDetail();
+  }, []);
   return (
     <div className="flex w-full h-screen">
-<UploadModal uploading={uploading} fileName={uploadedFile?.name} />
-            <FetchDetailsModal loading={loading && loadingMessage.includes("Loading")} message="Loading Content..." />
-            <GenerateLoadingModal loading={loading && !loadingMessage.includes("Loading")} loadingMessage={loadingMessage} />
+      <UploadModal uploading={uploading} fileName={uploadedFile?.name} />
+      <FetchDetailsModal
+        loading={loading && loadingMessage.includes("Loading")}
+        message="Loading Content..."
+      />
+      <GenerateLoadingModal
+        loading={loading && !loadingMessage.includes("Loading")}
+        loadingMessage={loadingMessage}
+      />
       <SideBar />
       <div className="w-[84vw] h-full flex-col">
         <div className="Title-group h-[10%] flex flex-col justify-center px-9">
           <h1 className="text-3xl font-bold text-[#4C1D95] mb-1">
-            Welcome Back, {username}
+            Welcome Back, {username.charAt(0).toUpperCase() + username.slice(1)}
           </h1>
           <p className="text-sm text-black/60 pt-1">
             Edit your transcript, regenerate and download your notes.
