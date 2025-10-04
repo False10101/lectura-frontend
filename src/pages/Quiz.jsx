@@ -11,12 +11,15 @@ const COLORS = {
   buttonEnd: "#4A1E94",
 };
 
+
+
 export const Quiz = () => {
   const total = quizQuestions.length;
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [dominant, setDominant] = useState(null);
+  const [varkResult, setVarkResult] = useState("");
 
   const percent = Math.round(((current + 1) / total) * 100);
   const currentQ = quizQuestions[current];
@@ -56,6 +59,9 @@ export const Quiz = () => {
 
     setDominant(best);
     setSubmitted(true);
+    
+    setVarkResult(labelFor[best]); // stored best VARK type
+
     console.log("VARK totals:", totals);
     console.log("Dominant:", best);
   };
@@ -79,8 +85,8 @@ export const Quiz = () => {
           <div className="text-center">
             <div
               style={{
-                width: 64,
-                height: 64,
+                width: 72,
+                height: 72,
                 borderRadius: 999,
                 background: COLORS.questionMarkBg,
                 color: "#fff",
@@ -88,6 +94,8 @@ export const Quiz = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 margin: "0 auto",
+                fontWeight: "700",
+                fontSize: 48,
               }}
             >
               ?
@@ -163,7 +171,7 @@ export const Quiz = () => {
               justifyContent: "center",
               margin: "0 auto",
               fontWeight: "700",
-              fontSize: 36,
+              fontSize: 48,
             }}
           >
             ?
