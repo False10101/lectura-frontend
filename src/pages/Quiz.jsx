@@ -70,7 +70,7 @@ export const Quiz = () => {
     []
   );
 
-  // --- Result Display ---
+  // Result Screen
   if (submitted) {
     return (
       <div className="flex h-screen bg-white">
@@ -145,7 +145,7 @@ export const Quiz = () => {
     );
   }
 
-  // --- Quiz Form ---
+  //Quiz Form
   return (
     <div className="flex h-screen bg-gray-50">
       <SideBar />
