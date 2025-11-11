@@ -16,12 +16,20 @@ import {
   ArrowPathIcon,
   CheckCircleIcon,
   MusicalNoteIcon,
+  PlayIcon,
+  PauseIcon,
 } from "@heroicons/react/24/solid";
 
 import MDEditor from "@uiw/react-md-editor";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import "../MdEditor.css";
+
+// import AudioPlayer from 'react-h5-audio-player';
+// import 'react-h5-audio-player/lib/styles.css';
+// import '../playerOverwrite.css';
+
+import CustomAudioPlayer from "../components/CustomAudioPlayer";
 
 import mermaid from "mermaid";
 import { getCodeString } from "rehype-rewrite";
@@ -268,6 +276,8 @@ const NoteDetail = () => {
   const [username, setUsername] = useState("");
   const [vark, setVark] = useState("");
   const [textMd, setTextMd] = useState("");
+  const [audioUrl, setAudioUrl] = useState(null);
+
   const { noteId } = useParams();
 
   const navigate = useNavigate();
@@ -291,6 +301,7 @@ const NoteDetail = () => {
         if (!response.ok) throw new Error("Failed to fetch note details");
 
         const data = await response.json();
+        console.log(data);
         const note = data.noteResponse;
 
         const syntheticFile = textToFile(
@@ -301,6 +312,7 @@ const NoteDetail = () => {
         setUploadedFile(syntheticFile);
         setTextMd(note.explanationText);
         setFileName(note.name);
+        setAudioUrl(note.audioUrl);
       } catch (error) {
         console.error("Loading Error:", error);
         alert("Loading Error", "Failed to load note details.");
@@ -597,10 +609,16 @@ const NoteDetail = () => {
             </button>
           </div>
           <div className="flex flex-col h-[92%] w-[68.5%] border-[#4C1D95]/40 border-[1px] rounded-2xl bg-[#faf8fe]">
-            <h1 className="px-5 py-2 font-semibold text-2xl text-[#4C1D95]">
-              Generated Lecture Notes
-            </h1>
-            <div className="w-full h-full p-4 flex flex-grow  overflow-auto">
+            <div className="flex h-[8%]">
+              <h1 className="w-max px-5 my-auto font-semibold text-2xl text-[#4C1D95]">
+                Generated Lecture Notes
+              </h1>
+              <div className="w-[60%] ml-auto h-[70%] my-auto mr-3">
+                {audioUrl && <CustomAudioPlayer src={audioUrl} />}
+              </div>
+            </div>
+
+            <div className="w-full flex-1 pb-4 flex flex-grow  overflow-auto">
               {/* The MDEditor component with Mermaid support */}
               <MDEditor
                 className="wmde-markdown-var !h-full"
