@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import NoteDetail from "./pages/NoteDetail";
 import { LandingPageRedirect } from "./pages/LandingPageRedirect";
 import { Quiz } from "./pages/Quiz";
+import UserDetail from "./pages/UserDetail";
 
 function App() {
   return (
@@ -37,6 +38,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Quiz />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/user"
+            element={
+              <ProtectedRoute>
+                <UserDetail />
               </ProtectedRoute>
             }
           />
