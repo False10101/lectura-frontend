@@ -101,7 +101,7 @@ const GenerateLoadingModal = ({ loading, loadingMessage }) => {
     <div className="fixed inset-0 flex justify-center items-center bg-black/60 backdrop-blur-sm z-50">
       <div className="bg-white border border-[#4C1D95] rounded-xl p-8 w-[70%] shadow-2xl">
         <h3 className="text-2xl font-semibold mb-8 text-center text-[#4C1D95]">
-          Regenerating Notes
+          Generating Notes
         </h3>
         <StepLoader currentStep={mapStatusToStep(loadingMessage)} />
       </div>

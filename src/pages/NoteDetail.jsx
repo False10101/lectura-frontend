@@ -499,7 +499,7 @@ const NoteDetail = () => {
   }, []);
 
   return (
-    <div className="flex w-full h-screen">
+    <div className="flex w-full h-screen overflow-hidden">
       <UploadModal uploading={uploading} fileName={uploadedFile?.name} />
       <FetchDetailsModal
         loading={loading && loadingMessage.includes("Loading")}
