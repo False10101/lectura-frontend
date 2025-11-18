@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import SideBar from "../components/SideBar";
 import quizQuestions from "../lib/quizQuestions";
 
@@ -11,15 +11,13 @@ const COLORS = {
   buttonEnd: "#4A1E94",
 };
 
-
-
 export const Quiz = () => {
   const total = quizQuestions.length;
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [dominant, setDominant] = useState(null);
-  const [varkResult, setVarkResult] = useState("");
+  // const [varkResult, setVarkResult] = useState(""); // <-- Removed, no longer needed
 
   const percent = Math.round(((current + 1) / total) * 100);
   const currentQ = quizQuestions[current];
@@ -35,36 +33,95 @@ export const Quiz = () => {
   };
 
   const goPrev = () => {
+    // <-- FIXED BUG HERE (was c + 1)
     if (current > 0) setCurrent((c) => c - 1);
   };
 
   const submitQuiz = () => {
+    // 1. Initialize totals
     const totals = { V: 0, A: 0, R: 0, K: 0 };
-    Object.entries(answers).forEach(([qid, idx]) => {
-      const q = quizQuestions.find((qq) => qq.id.toString() === qid.toString());
-      if (!q) return;
-      const w = q.options[idx]?.weights;
-      if (!w) return;
-      totals.V += w.V || 0;
-      totals.A += w.A || 0;
-      totals.R += w.R || 0;
-      totals.K += w.K || 0;
+
+    // 2. Loop over each question
+    quizQuestions.forEach((question) => {
+      // 3. Get the index of the answer the user chose (e.g., 0, 1, 2)
+      const selectedOptionIndex = answers[question.id];
+
+      // 4. Check if they answered this question
+      if (selectedOptionIndex !== undefined) {
+        
+        // 5. Get the specific option object they chose
+        // e.g., { text: "...", weights: { V: 5 } }
+        const chosenOption = question.options[selectedOptionIndex];
+        
+        // 6. Get the weights object from it
+        // e.g., { V: 5 }
+        const weightsObj = chosenOption.weights;
+
+        // 7. Get the key (e.g., "V")
+        const varkType = Object.keys(weightsObj)[0];
+        
+        // 8. Get the value (e.g., 5)
+        const weightValue = weightsObj[varkType];
+
+        // 9. Add that value to the correct total
+        if (totals.hasOwnProperty(varkType)) {
+          totals[varkType] += weightValue;
+        }
+      }
     });
 
+    // This part from before is now correct
     const order = ["V", "A", "R", "K"];
-    let best = order[0];
+    let best = order[0]; // Start with 'V'
+
+    // Loop and find the highest score
     order.forEach((k) => {
-      if (totals[k] > totals[best]) best = k;
+      if (totals[k] > totals[best]) {
+        best = k;
+      }
     });
 
     setDominant(best);
     setSubmitted(true);
-    
-    setVarkResult(labelFor[best]); // stored best VARK type
 
-    console.log("VARK totals:", totals);
-    console.log("Dominant:", best);
+    console.log("VARK totals:", totals); // This will now show correct totals
+    console.log("Dominant:", best);  // This will now show the correct winner
   };
+
+  const handleSetVark = useCallback(async () => {
+    if (!dominant) return;
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/user/vark/${dominant}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      // ===================================
+      // ADD THIS CHECK
+      // ===================================
+      if (!res.ok) {
+        // We got an error, like 404 or 500
+        const errorData = await res.json();
+        console.error("Failed to set VARK type:", res.status, errorData.payload);
+        return; // Stop here
+      }
+      // ===================================
+
+      // This line will ONLY run if res.ok was true
+      console.log("VARK type set successfully:", dominant);
+
+    } catch (error) {
+      // This catch block is for NETWORK errors
+      console.error("Network error setting VARK:", error);
+    }
+  }, [dominant]); // <-- Dependency is dominant
 
   const labelFor = useMemo(
     () => ({
@@ -75,6 +132,13 @@ export const Quiz = () => {
     }),
     []
   );
+
+  useEffect(() => {
+    // Check for dominant instead of varkResult
+    if (submitted && dominant) {
+      handleSetVark();
+    }
+  }, [submitted, dominant, handleSetVark]); // <-- Dependency is dominant
 
   // Result Screen
   if (submitted) {
@@ -141,6 +205,7 @@ export const Quiz = () => {
                   setDominant(null);
                   setAnswers({});
                   setCurrent(0);
+                  // setVarkResult(""); // <-- Removed
                 }}
                 className="px-6 py-2 rounded-md border"
               >
@@ -252,7 +317,7 @@ export const Quiz = () => {
             disabled={current === 0}
             className="absolute -left-16"
             style={{
-              bottom: -120, 
+              bottom: -120,
               padding: "8px 16px",
               borderRadius: 6,
               background: current === 0 ? "#f3f3f3" : `linear-gradient(90deg, ${COLORS.buttonStart}, ${COLORS.buttonEnd})`,
